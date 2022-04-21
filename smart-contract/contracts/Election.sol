@@ -10,7 +10,7 @@ contract Election is Pausable, ElectionAccessControl{
 
     string position;
     uint noOfpartcipate;
-    address[] participateAddress;
+    string[] participateAddress;
     bool electionStatus;
     bool resultStatus;
 
@@ -24,6 +24,7 @@ contract Election is Pausable, ElectionAccessControl{
     }
 
     mapping(address => bool) voterStatus;
+<<<<<<< HEAD
     mapping(address => Candidates) candidates;
     mapping(address => uint) voteCount;
     Candidates[] results;
@@ -33,7 +34,7 @@ contract Election is Pausable, ElectionAccessControl{
     
 
 
-    constructor(string memory _position, uint _noOfParticipants, address[] memory _participantsAddress) ElectionAccessControl(msg.sender){
+    constructor(address _owner,string memory _position, uint _noOfParticipants, address[] memory _participantsAddress, string[] memory _contestants, uint256 id) ElectionAccessControl(msg.sender){
         if(_noOfParticipants != _participantsAddress.length) revert NoOfParticatantNotMatchingParticipateId();
         position = _position;
         noOfpartcipate = _noOfParticipants;
@@ -42,6 +43,17 @@ contract Election is Pausable, ElectionAccessControl{
            Candidates storage _candidates = candidates[_participantsAddress[i]];
            _candidates.candidatesAddress = _participantsAddress[i];
         }
+=======
+    mapping(string => uint) voteCount;
+    uint[] results;
+
+
+    constructor(address _owner, string memory _position, uint _noOfParticipants, string[] memory _contestants, uint256 id) {
+        if(_noOfParticipants != _contestants.length) revert NoOfParticatantNotMatchingParticipateId();
+        position = _position;
+        noOfpartcipate = _noOfParticipants;
+        participateAddress = _contestants;
+>>>>>>> 61f9a26c17a9f87011ee6b6d5c0bfc13b87c763f
     }
 
 
@@ -66,7 +78,7 @@ contract Election is Pausable, ElectionAccessControl{
         return true;
     }
 
-    function vote(address _participantsAddress) public whenNotPaused returns(bool){
+    function vote(string memory _participantsAddress) public whenNotPaused returns(bool){
         if(voterStatus[msg.sender] == true) revert AlreadyVoted();
         uint currentVote = voteCount[_participantsAddress];
         voteCount[_participantsAddress] = currentVote + 1;
