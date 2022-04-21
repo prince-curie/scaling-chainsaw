@@ -9,7 +9,7 @@ contract Election is Pausable{
 
     string position;
     uint noOfpartcipate;
-    address[] participateAddress;
+    string[] participateAddress;
     bool electionStatus;
     bool resultStatus;
 
@@ -18,15 +18,15 @@ contract Election is Pausable{
     error ResultNotYetRelease();
 
     mapping(address => bool) voterStatus;
-    mapping(address => uint) voteCount;
+    mapping(string => uint) voteCount;
     uint[] results;
 
 
-    constructor(string memory _position, uint _noOfParticipants, address[] memory _participantsAddress){
-        if(_noOfParticipants != _participantsAddress.length) revert NoOfParticatantNotMatchingParticipateId();
+    constructor(address _owner, string memory _position, uint _noOfParticipants, string[] memory _contestants, uint256 id) {
+        if(_noOfParticipants != _contestants.length) revert NoOfParticatantNotMatchingParticipateId();
         position = _position;
         noOfpartcipate = _noOfParticipants;
-        participateAddress = _participantsAddress;
+        participateAddress = _contestants;
     }
 
 
@@ -42,7 +42,7 @@ contract Election is Pausable{
 
     }
 
-    function vote(address _participantsAddress) public whenNotPaused returns(bool){
+    function vote(string memory _participantsAddress) public whenNotPaused returns(bool){
         if(voterStatus[msg.sender] == true) revert AlreadyVoted();
         uint currentVote = voteCount[_participantsAddress];
         voteCount[_participantsAddress] = currentVote + 1;

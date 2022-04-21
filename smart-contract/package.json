@@ -4,8 +4,8 @@
     "compile": "npx hardhat compile",
     "deploy": "npx hardhat run ./scripts/deploy.js",
     "verify": "npx hardhat verify",
-    "test": "npx hardhat test ./tests/*.js",
-    "coverage": "npx hardhat coverage --testfiles './tests/*.js'"
+    "test": "npx hardhat test",
+    "coverage": "npx hardhat coverage --testfiles './test/*.js'"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.5",

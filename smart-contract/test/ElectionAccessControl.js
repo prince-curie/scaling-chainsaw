@@ -31,6 +31,17 @@ describe('ElectionAccessControl', function() {
         expect(result2).to.equal(true);
     })
 
+    it('Should emit RenounceRole event', async function() {
+        let chairmanRole = await contract.CHAIRMAN_ROLE();
+        let directorRole = await contract.DIRECTOR_ROLE();
+
+        await contract.grantRole(directorRole, director.address);
+
+        await expect(contract.renounceRole(chairmanRole, director.address))
+            .to.emit(contract, 'RenounceRole')
+            .withArgs(chairman.address, director.address);
+    })
+
     it('Should revert if a none chairman role tries to renounce', async function() {
         let directorRole = await contract.DIRECTOR_ROLE();
         
