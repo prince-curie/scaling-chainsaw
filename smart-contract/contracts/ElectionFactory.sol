@@ -20,8 +20,10 @@ contract ElectionFactory {
     }
     ElectionDetails[] elections;
     
+    /// @notice Number of elections conducted
     uint256 public electionCount;
 
+    /// @notice Election status
     string constant private PENDING = 'Pending';
     string constant private STARTED = 'Started';
     string constant private ENDED = 'Ended';
