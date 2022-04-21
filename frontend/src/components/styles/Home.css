@@ -1,0 +1,25 @@
+.home{
+    margin-top:100px;
+    display:flex;
+    justify-content:space-between;
+    align-items: center;
+    background-color:#efebeb;
+    height: 70vh;
+}
+
+.home .left{
+    width:50%;
+}
+
+img{
+    width: 200px;
+}
+
+.home .right{
+    width: 50%;
+    text-align: left;
+}
+
+.home .right p{
+    color: #a4a4a4
+}
