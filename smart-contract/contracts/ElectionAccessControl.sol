@@ -3,12 +3,19 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
+/// @title Election factory contract
+/// @author Team-d
+/// @dev The contract extends the AccessControl contract by overriding the revokeRole and 
+/// @dev renounceRole methods with checks to meet the needed behaviour
+
 contract ElectionAccessControl is AccessControl {
     /// @dev Declares and initialises various roles
     bytes32 public constant CHAIRMAN_ROLE = keccak256("CHAIRMAN_ROLE");
     bytes32 public constant DIRECTOR_ROLE = keccak256("DIRECTOR_ROLE");
     bytes32 public constant TEACHER_ROLE = keccak256("TEACHER_ROLE");
     bytes32 public constant STUDENT_ROLE = keccak256("STUDENT_ROLE");
+
+    event RenounceRole(address indexed previousChairman, address indexed newChairman);
 
     constructor(address _owner) {
         /// @dev Creates the role admins for different roles
@@ -39,6 +46,8 @@ contract ElectionAccessControl is AccessControl {
         super._grantRole(CHAIRMAN_ROLE, _account);
 
         super._revokeRole(CHAIRMAN_ROLE, msg.sender);
+
+        emit RenounceRole(msg.sender, _account);
     }
 
     /**
