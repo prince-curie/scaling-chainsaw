@@ -1,0 +1,51 @@
+Arguments: 
+  /usr/bin/node /usr/bin/yarn install
+
+PATH: 
+  /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/home/pelumi/.foundry/bin:/home/pelumi/.foundry/bin
+
+Yarn version: 
+  1.22.18
+
+Node version: 
+  14.18.3
+
+Platform: 
+  linux x64
+
+Trace: 
+  Error: connect EHOSTUNREACH 104.16.25.35:443
+      at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1159:16)
+
+npm manifest: 
+  {
+    "name": "hardhat-project",
+    "devDependencies": {
+      "@nomiclabs/hardhat-ethers": "^2.0.5",
+      "@nomiclabs/hardhat-etherscan": "^3.0.3",
+      "@nomiclabs/hardhat-waffle": "^2.0.3",
+      "chai": "^4.3.6",
+      "dotenv": "^10.0.0",
+      "eslint": "^7.32.0",
+      "eslint-config-prettier": "^8.5.0",
+      "eslint-config-standard": "^16.0.3",
+      "eslint-plugin-import": "^2.26.0",
+      "eslint-plugin-node": "^11.1.0",
+      "eslint-plugin-prettier": "^3.4.1",
+      "eslint-plugin-promise": "^5.2.0",
+      "ethereum-waffle": "^3.4.4",
+      "ethers": "^5.6.4",
+      "hardhat": "^2.9.3",
+      "hardhat-gas-reporter": "^1.0.8",
+      "prettier": "^2.6.2",
+      "prettier-plugin-solidity": "^1.0.0-beta.13",
+      "solhint": "^3.3.7",
+      "solidity-coverage": "^0.7.20"
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
