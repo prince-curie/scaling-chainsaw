@@ -54,11 +54,11 @@ contract ElectionFactory {
     }
 
     /// @dev Deploys a new election smart contract and stores the details.
-    function createElection(string memory _position, string[] memory _contestants) external onlyOwner {
+    function createElection(string memory _position, string[] memory _contestants, address[] memory _contestantsAddress) external onlyOwner returns(address) {
         uint256 count = electionCount;
         count++;
 
-        Election election = new Election(msg.sender, _position, _contestants.length, _contestants, count);
+        Election election = new Election(msg.sender, _position, _contestants.length, _contestants, _contestantsAddress);
         
         ElectionDetails memory electionDetail;
 
@@ -74,5 +74,10 @@ contract ElectionFactory {
         electionCount = count;
 
         emit CreateElection(count, election, msg.sender, _position);
+        return address(election);
+    }
+
+    function allElections() public view returns(ElectionDetails[] memory){
+        return elections;
     }
 }
