@@ -4,6 +4,7 @@ pragma solidity ^0.8.0;
 import "hardhat/console.sol";
 import '@openzeppelin/contracts/security/Pausable.sol';
 import './ElectionAccessControl.sol';
+import "./interfaces/IElectionFactory.sol";
 
 contract Election is Pausable, ElectionAccessControl{
 
@@ -13,6 +14,16 @@ contract Election is Pausable, ElectionAccessControl{
     string[] contestantsName;
     bool electionStatus;
     bool resultStatus;
+
+    /// @notice Election status
+    string constant private PENDING = 'Pending';
+    string constant private STARTED = 'Started';
+    string constant private ENDED = 'Ended';
+    string constant private RESULTS_READY = 'Results ready';
+
+    uint256 immutable index;
+
+    address immutable electionFactory;
 
     error NoOfParticatantNotMatchingParticipateName();
     error AlreadyVoted();
@@ -29,11 +40,13 @@ contract Election is Pausable, ElectionAccessControl{
     Candidates[] results;
 
 
-    constructor(address _owner,string memory _position, uint _noOfParticipants, string[] memory _contestants) ElectionAccessControl(_owner){
+    constructor(address _owner,string memory _position, uint _noOfParticipants, string[] memory _contestants, uint256 _index, address _electionFactory) ElectionAccessControl(_owner){
         if(_noOfParticipants != _contestants.length) revert NoOfParticatantNotMatchingParticipateName();
         position = _position;
         noOfpartcipate = _noOfParticipants;
         contestantsName = _contestants;
+        index = _index;
+        electionFactory = _electionFactory;
 
         for(uint i=0; i < _contestants.length;i++){
            Candidates storage _candidates = candidates[_contestants[i]];
@@ -82,6 +95,9 @@ contract Election is Pausable, ElectionAccessControl{
 
     function showResult() onlyRole(CHAIRMAN_ROLE) public returns(bool){
         resultStatus = true;
+
+        _upStatusOnFactory(RESULTS_READY);
+
         return true;
     }
 
@@ -92,5 +108,10 @@ contract Election is Pausable, ElectionAccessControl{
 
     function privateViewResult() onlyRole(TEACHER_ROLE) onlyRole(CHAIRMAN_ROLE) public view returns(Candidates[] memory){
         return results;
+    }
+
+    /// @dev Makes call to the election factory to update the status of an election.
+    function _upStatusOnFactory(string _status) internal {
+        IElectionFactory(electionFactory).upStateElectionStatus(index, _status);
     }
 }
