@@ -1,20 +1,22 @@
-import React from 'react';
-import Welcome from '../../assets/welcome.png';
+import React, { useContext } from 'react';
+import { Header } from '../../containers';
 import '../styles/Home.css';
 
+// import { VotingContext } from '../../context/VotingContext';
+
 const Home = () => {
+	// const { connectWallet } = useContext(VotingContext);
+
 	return (
 		<div className='home'>
-			<div className='left'>
-				<img src={Welcome} alt='Welcome' />
-			</div>
-			<div className='right'>
-				<h1>ZuriDAO a Decentralize Autonomous Organization</h1>
-				<p>
-					We put the needs and care of the leaders of tomorrow above all else,
-					grooming them to be world class leaders.
-				</p>
-			</div>
+			{/* <div className='left'>
+				<img src={Vote} alt='vote' />
+			</div> */}
+			{/* <button className='btn' onClick={connectWallet}>
+					Connect Wallet
+				</button> */}
+			{/* </div> */}
+			<Header />
 		</div>
 	);
 };
