@@ -11,7 +11,11 @@ describe("Election", function () {
 
   describe("vote()", function () {
     it("Should be able to vote if a stakeholder", async function () {
-      
+      const vote = await election.vote("0xc9e9DB9dcF8fAF12D4357868222B05E369EadB9b")
+      const result = await election.compileResult()
+      const results = await election.result();
+      console.log(results) 
+     //expect( await election.vote("0xc9e9DB9dcF8fAF12D4357868222B05E369EadB9b")).to.equal(true);
     })
   });
 });
