@@ -11,7 +11,6 @@ contract Election is Pausable, ElectionAccessControl{
     string position;
     uint noOfpartcipate;
     string[] contestantsName;
-    address[] contestantsAddress;
     bool electionStatus;
     bool resultStatus;
 
@@ -21,27 +20,24 @@ contract Election is Pausable, ElectionAccessControl{
 
     struct Candidates{
         string candidatesName;
-        address candidatesAddress;
         uint voteCount;
     }
 
     mapping(address => bool) voterStatus;
-    mapping(address => Candidates) candidates;
-    mapping(address => uint) voteCount;
+    mapping(string => Candidates) candidates;
+    mapping(string => uint) voteCount;
     Candidates[] results;
 
 
-    constructor(address _owner,string memory _position, uint _noOfParticipants, string[] memory _contestants, address[] memory _contestantsAddress) ElectionAccessControl(_owner){
+    constructor(address _owner,string memory _position, uint _noOfParticipants, string[] memory _contestants) ElectionAccessControl(_owner){
         if(_noOfParticipants != _contestants.length) revert NoOfParticatantNotMatchingParticipateName();
         position = _position;
         noOfpartcipate = _noOfParticipants;
         contestantsName = _contestants;
-        contestantsAddress = _contestantsAddress;
 
         for(uint i=0; i < _contestants.length;i++){
-           Candidates storage _candidates = candidates[_contestantsAddress[i]];
+           Candidates storage _candidates = candidates[_contestants[i]];
            _candidates.candidatesName = _contestants[i];
-           _candidates.candidatesAddress = _contestantsAddress[i];
         }
     }
 
@@ -67,18 +63,18 @@ contract Election is Pausable, ElectionAccessControl{
         return true;
     }
 
-    function vote(address _participantsAddress) public onlyRole(STUDENT_ROLE) onlyRole(TEACHER_ROLE) onlyRole(CHAIRMAN_ROLE) onlyRole(DIRECTOR_ROLE) whenNotPaused returns(bool){
+    function vote(string memory _participantsName) public onlyRole(STUDENT_ROLE) onlyRole(TEACHER_ROLE) onlyRole(CHAIRMAN_ROLE) onlyRole(DIRECTOR_ROLE) whenNotPaused returns(bool){
         if(voterStatus[msg.sender] == true) revert AlreadyVoted();
-        uint currentVote = voteCount[_participantsAddress];
-        voteCount[_participantsAddress] = currentVote + 1;
+        uint currentVote = voteCount[_participantsName];
+        voteCount[_participantsName] = currentVote + 1;
         voterStatus[msg.sender] = true;
         return true;
     }
 
     function compileResult() public onlyRole(TEACHER_ROLE) onlyRole(CHAIRMAN_ROLE) returns(Candidates[] memory){
-        for(uint i = 0; i < contestantsAddress.length; i++){
-            Candidates storage _candidates = candidates[contestantsAddress[i]];
-            _candidates.voteCount = voteCount[contestantsAddress[i]];
+        for(uint i = 0; i < contestantsName.length; i++){
+            Candidates storage _candidates = candidates[contestantsName[i]];
+            _candidates.voteCount = voteCount[contestantsName[i]];
             results.push(_candidates);
         }
         return results;
