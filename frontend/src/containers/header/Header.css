@@ -1,0 +1,130 @@
+.zuri__header{
+    display:flex;
+}
+
+.zuri__header-content{
+    flex: 1;
+    display: flex;
+    justify-content:center;
+    align-items:flex-start;
+    flex-direction:column;
+
+    margin-right: 5rem;
+}
+
+.zuri__header-content h1{
+    font-family: var(--font-family);
+    font-weight: 800;
+    font-size:62px;
+    line-height: 75px;
+    letter-spacing: -0.04em;
+}
+
+.zuri__header-content p{
+    font-family: var(--font-family);
+    font-size:20px;
+    line-height: 27px;
+    color: var(--color-text);
+    margin-top:1.5rem;
+}
+
+.zuri__header-content__people{
+    width: 100%;
+    display: flex;
+    justify-content:flex-start;
+    align-items:center;
+    margin-top:2rem;
+}
+
+.zuri__header-content__people img{
+    width:400px;
+    height: 200px;
+}
+
+.zuri__header-content__people p{
+    margin-left: 0 0 0 1rem;
+    font-family: var(--font-family);
+    font-weight: 500;
+    font: size 12px;
+    line-height: 38px;
+    color:#fff;
+    text-align: center;
+}
+
+.connect-wallet button{
+    margin-top: 5rem;
+    flex:2;
+    background: #ff4820;
+    border-radius: 5px;
+    font-weight: 600;
+    font-size: 20px;
+    line-height: 27px;
+    color: #fff;
+    width: 150%;
+    height:60px;
+    outline: none;
+    border: none;
+    cursor: pointer;
+}
+
+.connect-wallet button:hover{
+    font-weight: 700;
+    font-size: 21px;
+}
+
+.zuri__header-image{
+    flex: 1;
+    display: flex;
+    justify-content:center;
+    align-items:center
+}
+
+.zuri__header-image img{
+    display: none;
+}
+
+@media screen and (max-width: 1050px){
+    .zuri__header{
+        flex-direction: column;
+    }
+
+    .zuri__header-content__people{
+        flex-direction: column;
+    }
+    .zuri__header-content{
+        margin: 0 0 3rem;
+    }
+}
+
+@media screen and (max-width: 650px){
+    .zuri__header h1{
+        font-size: 48px;
+        line-height:60px;
+    }
+
+    .zuri__header p{
+        font-size: 16px;
+        line-height:24px;
+    }
+
+    .zuri__header-content__people{
+        flex-direction: column;
+    }
+
+    .zuri__header-content__people p{
+        margin: 0;
+    }
+
+}
+
+@media screen and (max-width: 490px){
+    .zuri__header h1{
+        font-size: 36px;
+        line-height:48px;
+    }
+
+    .zuri__header p{
+        font-size: 14px;
+        line-height:24px;
+    }
+}

@@ -1,39 +1,51 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import logo from '../assets/ZuriDAO.png';
+import { RiMenu3Line, RiCloseLine } from 'react-icons/ri';
 import './styles/Navbar.css';
-// import MenuIcon from '@mui/icons-material/Menu';
+import { Link } from 'react-router-dom';
+
+const Menu = () => (
+	<>
+		<Link to='/'>Home</Link>
+		<Link to='/vote'>Vote</Link>
+		<Link to='/connect'>Connect Wallet</Link>
+	</>
+);
 
 const Navbar = () => {
-	const [openLinks, setOpenLinks] = useState(false);
-
-	const toggleNavbar = () => {
-		setOpenLinks(!openLinks);
-	};
+	const [toggleMenu, setToggleMenu] = useState(false);
 	return (
-		<nav className='navbar'>
-			<div className='left' id={openLinks ? 'open' : 'close'}>
-				<Link to='/'>
-					<img src={logo} alt='zuri dao' />
-				</Link>
-
-				<div className='hiddenLinks'>
-					<Link to='/'>Home</Link>
-					<Link to='/about'>About</Link>
-					<Link to='/vote'>Vote</Link>
-					<Link to='/connect'>Connect Wallet</Link>
+		<div className='navbar'>
+			<div className='navbar-links'>
+				<div className='navbar-links_logo'>
+					<h1>ZuriElection</h1>
+				</div>
+				<div className='navbar-links_container'>
+					<Menu className='navbar-menu_container' />
 				</div>
 			</div>
-			<div className='right'>
-				<Link to='/'>Home</Link>
-				<Link to='/about'>About</Link>
-				<Link to='/vote'>Vote</Link>
-				<Link to='/connect'>Connect Wallet</Link>
-				{/* <button onClick={toggleNavbar}>
-					<MenuIcon />
-				</button> */}
+			<div className='navbar-menu'>
+				{toggleMenu ? (
+					<RiCloseLine
+						color='#fff'
+						size={27}
+						onClick={() => setToggleMenu(false)}
+					/>
+				) : (
+					<RiMenu3Line
+						color='#fff'
+						size={27}
+						onClick={() => setToggleMenu(true)}
+					/>
+				)}
+				{toggleMenu && (
+					<div className='navbar-menu_container scale-up-center'>
+						<div className='navbar-menu_container-links'>
+							<Menu />
+						</div>
+					</div>
+				)}
 			</div>
-		</nav>
+		</div>
 	);
 };
 
