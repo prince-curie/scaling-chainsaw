@@ -12,13 +12,13 @@ contract ElectionFactory {
 
     struct ElectionDetails {
         uint256 id;
-        Election electionAddress;
+        address electionAddress;
         string position;
         string[] contestants;
         uint256 createdAt;
         string status;
     }
-    ElectionDetails[] elections;
+    ElectionDetails[] private elections;
     
     /// @notice Number of elections conducted
     uint256 public electionCount;
@@ -30,10 +30,12 @@ contract ElectionFactory {
     string constant private RESULTS_READY = 'Results ready';
 
     event SetOwner(address indexed oldOwner, address indexed newOwner);
-    event CreateElection(uint256 id, Election election, address indexed creator, string position);
-    event electionSent(uint time, uint lengthOfElections);
+    event CreateElection(uint256 id, address electionAddress, address indexed creator, string position);
+    event UpdateElectionStatus(string status, address electionAddress);
 
     error NotAuthorised(address caller);
+    error UnAuthorizedElectionContract(address electionContract);
+    error BadStatusRequest(string status);
     
     constructor() {
         owner = msg.sender;
@@ -59,12 +61,12 @@ contract ElectionFactory {
         uint256 count = electionCount;
         count++;
 
-        Election election = new Election(msg.sender, _position, _contestants.length, _contestants);
+        Election election = new Election(msg.sender, _position, _contestants.length, _contestants, count, address(this));
         
         ElectionDetails memory electionDetail;
 
         electionDetail.id = count;
-        electionDetail.electionAddress = election;
+        electionDetail.electionAddress = address(election);
         electionDetail.position = _position;
         electionDetail.contestants = _contestants;
         electionDetail.createdAt = block.timestamp;
@@ -74,19 +76,40 @@ contract ElectionFactory {
 
         electionCount = count;
 
-        emit CreateElection(count, election, msg.sender, _position);
+        emit CreateElection(count, address(election), msg.sender, _position);
     }
 
+    /// @dev Called from the election contract to update the status of an election
+    function updateElectionStatus(uint256 _electionId, string memory _status) external {
+        ElectionDetails memory electionDetails = elections[_electionId - 1];
+
+        if(electionDetails.electionAddress != msg.sender) {
+            revert UnAuthorizedElectionContract(msg.sender);
+        }
+
+        electionDetails.status = _status;
+
+        elections[_electionId - 1] = electionDetails;
+
+        emit UpdateElectionStatus(_status, electionDetails.electionAddress);
+    }
+    
     /// @dev Sends a list of election parameters
-    function getElections (uint256 _start, uint256 _length) external view onlyOwner returns(
-        address [] memory electionAddress, 
-        string [] memory position,
-        uint256 [] memory createdAt,
-        string[] memory status ){
+    function getElections (uint256 _start, uint256 _length) 
+        external 
+        view 
+        onlyOwner 
+        returns(
+            address [] memory electionAddress, 
+            string [] memory position,
+            uint256 [] memory createdAt,
+            string[] memory status 
+        )
+    {
         require(_start > 0, "Caller cannot start from zero start from one");
         
         uint256 electionsLength = elections.length;
-        uint256 end = _start + length;
+        uint256 end = _start + _length;
 
         if(electionsLength < end){
             _length = (electionsLength - _start) + 1;
@@ -112,7 +135,5 @@ contract ElectionFactory {
         }
 
         return (electionAddress, position, createdAt, status);
-
-            emit electionSent(block.timestamp, _length);
     }
 }
