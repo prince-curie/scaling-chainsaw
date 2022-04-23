@@ -84,7 +84,6 @@ contract ElectionFactory {
         uint256 [] memory createdAt,
         string[] memory status ){
         require(_start > 0, "Caller cannot start from zero start from one");
-        
         uint256 electionsLength = elections.length;
         uint256 end = _start + length;
 
