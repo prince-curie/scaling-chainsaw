@@ -193,9 +193,9 @@ contract Election is Pausable, ElectionAccessControl{
 
     /// @notice Ensures that voting begins
     function enableVoting() external onlyRole(CHAIRMAN_ROLE) {
-        startAt = block.timestamp;
+         startAt = block.timestamp;
 
-        _updateStatusOnFactory(STARTED);
+         _updateStatusOnFactory(STARTED);
 
         emit StartVoting(block.timestamp);
     }
