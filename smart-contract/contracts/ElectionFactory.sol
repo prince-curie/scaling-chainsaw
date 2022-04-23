@@ -31,7 +31,7 @@ contract ElectionFactory {
 
     event SetOwner(address indexed oldOwner, address indexed newOwner);
     event CreateElection(uint256 id, Election election, address indexed creator, string position);
-    event electionSent(uint time, string position, uint id, address electionAddress, string status);
+    event electionSent(uint time, string position, uint id, address indexed electionAddress, string status);
 
     error NotAuthorised(address caller);
     
@@ -88,7 +88,7 @@ contract ElectionFactory {
             _elections.push([i-1]);
         }
 
-        for (uint256 i = 0; i <= elections.length; i++){
+        for (uint256 i = 0; i <= _elections.length; i++){
             emit electionSent([i].createdAt, [i].position, [i].id, [i].electionAddress, [i].status);
         }
     }
