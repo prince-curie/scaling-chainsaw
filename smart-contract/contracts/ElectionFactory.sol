@@ -83,8 +83,9 @@ contract ElectionFactory {
 
         for (uint256 i; i <= elections.length; i++){
             [i].status = STARTED;
-            return elections;
         }
+
+        return elections;
 
         emit electionSent(block.timestamp, elections);
     }
