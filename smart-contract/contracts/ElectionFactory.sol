@@ -83,7 +83,7 @@ contract ElectionFactory {
         // reversed list
         ElectionDetails [] _elections;
 
-        for (uint256 i = 0; i <= elections.length; i--){
+        for (uint256 i = elections.length; i > 0; i--){
             [i].status = STARTED;
             _elections.push([i-1]);
         }
