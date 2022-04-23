@@ -4,11 +4,20 @@ import Navbar from './components/Navbar';
 import Home from './components/pages/Home';
 import Vote from './components/pages/Vote';
 import Footer from './components/Footer';
+import {ethers} from 'ethers'
+import {Web3ReactProvider} from '@web3-react/core'
+
+const getLibrary = (provider) => {
+	const library = new ethers.providers.Web3Provider(provider);
+	library.pollingInterval = 8000; // frequency provider is polling
+	return library;
+  };
 
 function App() {
 	return (
 		<div className='App'>
 			<div className='gradient__bg'>
+				<Web3ReactProvider getLibrary={getLibrary}>
 				<BrowserRouter>
 					<Navbar />
 					<Routes>
@@ -17,6 +26,7 @@ function App() {
 					</Routes>
 					<Footer />
 				</BrowserRouter>
+				</Web3ReactProvider>
 			</div>
 		</div>
 	);

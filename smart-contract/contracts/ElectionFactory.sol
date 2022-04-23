@@ -98,7 +98,6 @@ contract ElectionFactory {
     function getElections (uint256 _start, uint256 _length) 
         external 
         view 
-        onlyOwner 
         returns(
             address [] memory electionAddress, 
             string [] memory position,
