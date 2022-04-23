@@ -12,7 +12,7 @@ contract ElectionFactory {
 
     struct ElectionDetails {
         uint256 id;
-        Election electionAddress;
+        address electionAddress;
         string position;
         string[] contestants;
         uint256 createdAt;
@@ -30,8 +30,8 @@ contract ElectionFactory {
     string constant private RESULTS_READY = 'Results ready';
 
     event SetOwner(address indexed oldOwner, address indexed newOwner);
-    event CreateElection(uint256 id, Election electionAddress, address indexed creator, string position);
-    event UpdateElectionStatus(string status, Election electionAddress);
+    event CreateElection(uint256 id, address electionAddress, address indexed creator, string position);
+    event UpdateElectionStatus(string status, address electionAddress);
 
     error NotAuthorised(address caller);
     error UnAuthorizedElectionContract(address electionContract);
@@ -66,7 +66,7 @@ contract ElectionFactory {
         ElectionDetails memory electionDetail;
 
         electionDetail.id = count;
-        electionDetail.electionAddress = election;
+        electionDetail.electionAddress = address(election);
         electionDetail.position = _position;
         electionDetail.contestants = _contestants;
         electionDetail.createdAt = block.timestamp;
@@ -76,14 +76,10 @@ contract ElectionFactory {
 
         electionCount = count;
 
-        emit CreateElection(count, election, msg.sender, _position);
+        emit CreateElection(count, address(election), msg.sender, _position);
     }
 
-    function updtateElectionStatus(uint256 _electionId, string memory _status) external {
-        if(_status != PENDING && _status != STARTED && _status != ENDED && _status != RESULTS_READY) {
-            revert BadStatusRequest(_status);
-        }
-        
+    function updateElectionStatus(uint256 _electionId, string memory _status) external {
         ElectionDetails memory electionDetails = elections[_electionId - 1];
 
         if(electionDetails.electionAddress != msg.sender) {
