@@ -48,12 +48,12 @@ contract Election is Pausable, ElectionAccessControl{
     /// ======================= MODIFIERS =================================
     ///@notice modifier to specify that election has not ended
     modifier electionHasEnded() {
-        require(endAt > startAt , "Sorry, the Election has ended!");
+        require(startAt > endAt, "Sorry, the Election has ended!");
         _;
     }
     ///@notice modifier to check that election is active
     modifier electionIsActive() {
-        require(startAt == 0 , "Election has not begun!");
+        require(startAt > 0 , "Election has not begun!");
         _;
     }
     
@@ -221,7 +221,7 @@ contract Election is Pausable, ElectionAccessControl{
     }
 
     function disableVoting() external onlyRole(CHAIRMAN_ROLE) {
-        if(endAt <= startAt)
+        if(endAt == startAt)
             revert VotingNotStarted();
 
         endAt = block.timestamp;
@@ -253,6 +253,8 @@ contract Election is Pausable, ElectionAccessControl{
         resultStatus = true;
 
         _updateStatusOnFactory(RESULTS_READY);
+
+        resultReadyAt = block.timestamp;
 
         return true;
     }
