@@ -31,7 +31,7 @@ contract ElectionFactory {
 
     event SetOwner(address indexed oldOwner, address indexed newOwner);
     event CreateElection(uint256 id, Election election, address indexed creator, string position);
-    event electionSent(uint time, string position, uint id, address indexed electionAddress, string status);
+    event electionSent(uint time, uint lengthOfElections);
 
     error NotAuthorised(address caller);
     
@@ -77,19 +77,42 @@ contract ElectionFactory {
         emit CreateElection(count, election, msg.sender, _position);
     }
 
-    /// @dev Sends a list of elections and updates the status.
-    function sendElections () external onlyOwner returns(ElectionsDetails [] memory){
-        require(elections.length <= 20, "Can only send 20 elections at a time");
-        // reversed list
-        ElectionDetails [] _elections;
+    /// @dev Sends a list of election parameters
+    function getElections (uint256 _start, uint256 _length) external view onlyOwner returns(
+        address [] memory electionAddress, 
+        string [] memory position,
+        uint256 [] memory createdAt,
+        string[] memory status ){
+        require(_start > 0, "Caller cannot start from zero start from one");
+        
+        uint256 electionsLength = elections.length;
+        uint256 end = _start + length;
 
-        for (uint256 i = elections.length; i > 0; i--){
-            [i].status = STARTED;
-            _elections.push([i-1]);
+        if(electionsLength < end){
+            _length = (electionsLength - _start) + 1;
+            end = electionsLength + 1;
         }
 
-        for (uint256 i = 0; i <= _elections.length; i++){
-            emit electionSent([i].createdAt, [i].position, [i].id, [i].electionAddress, [i].status);
+        electionAddress = new address[] (_length);
+        position = new string[] (_length);
+        createdAt = new uint256[](_length);
+        status = new string[] (_length);
+
+        uint256 counter = 0;
+
+        for (uint256 i = _start; i < end; i++){
+            ElectionDetails memory election = elections[i-1];
+
+            electionAddress[counter] = election.electionAddress;
+            position[counter] = election.position;
+            createdAt[counter] = election.createdAt;
+            status[counter] = election.status;
+
+            counter++;
         }
+
+        return (electionAddress, position, createdAt, status);
+
+            emit electionSent(block.timestamp, _length);
     }
 }
