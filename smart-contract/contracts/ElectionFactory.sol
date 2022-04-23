@@ -31,7 +31,7 @@ contract ElectionFactory {
 
     event SetOwner(address indexed oldOwner, address indexed newOwner);
     event CreateElection(uint256 id, Election election, address indexed creator, string position);
-    event electionSent(uint time, ElectionDetails elections);
+    event electionSent(uint time, string position, uint id, address electionAddress, string status);
 
     error NotAuthorised(address caller);
     
@@ -80,13 +80,16 @@ contract ElectionFactory {
     /// @dev Sends a list of elections and updates the status.
     function sendElections () external onlyOwner returns(ElectionsDetails [] memory){
         require(elections.length <= 20, "Can only send 20 elections at a time");
+        // reversed list
+        ElectionDetails [] _elections;
 
-        for (uint256 i; i <= elections.length; i++){
+        for (uint256 i = 0; i <= elections.length; i--){
             [i].status = STARTED;
+            _elections.push([i-1]);
         }
 
-        return elections;
-
-        emit electionSent(block.timestamp, elections);
+        for (uint256 i = 0; i <= elections.length; i++){
+            emit electionSent([i].createdAt, [i].position, [i].id, [i].electionAddress, [i].status);
+        }
     }
 }
