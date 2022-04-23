@@ -17,6 +17,7 @@ contract Election is Pausable, ElectionAccessControl{
     error NoOfParticatantNotMatchingParticipateName();
     error AlreadyVoted();
     error ResultNotYetRelease();
+    error AccessDenied();
 
     struct Candidates{
         string candidatesName;
@@ -28,6 +29,25 @@ contract Election is Pausable, ElectionAccessControl{
     mapping(string => uint) voteCount;
     Candidates[] results;
 
+    modifier allRole() {
+        require(hasRole(CHAIRMAN_ROLE, msg.sender) == true || hasRole(TEACHER_ROLE, msg.sender) == true || hasRole(STUDENT_ROLE, msg.sender) == true || hasRole(DIRECTOR_ROLE, msg.sender) == true, "ACCESS DENIED");
+        _;
+    }
+
+    modifier onlyChairmanAndTeacherRole () {
+        require(hasRole(CHAIRMAN_ROLE, msg.sender) == true || hasRole(TEACHER_ROLE, msg.sender) == true, "ACCESS FOR TEACHER(s) AND CHAIRMAN ONLY" );
+        _;
+    }
+
+    modifier onlyChairmanAndTeacherAndDirectorRole() {
+        require(hasRole(CHAIRMAN_ROLE, msg.sender) == true || hasRole(TEACHER_ROLE, msg.sender) == true || hasRole(DIRECTOR_ROLE,msg.sender) == true, "ACCESS FOR TEACHER(s) AND CHAIRMAN ONLY" );
+        _;
+    }
+
+    event SetUpTeacher(address[] teacher);
+    event RegisterTeacher(address[] student);
+    event SetUpDirector(address[] director);
+    event Vote(string candidates, address voter);
 
     constructor(address _owner,string memory _position, uint _noOfParticipants, string[] memory _contestants) ElectionAccessControl(_owner){
         if(_noOfParticipants != _contestants.length) revert NoOfParticatantNotMatchingParticipateName();
@@ -42,36 +62,85 @@ contract Election is Pausable, ElectionAccessControl{
     }
 
 
+/// @notice setup teachers
+/// @dev only CHAIRMAN_ROLE can call this method
+/// @param _teacher array of address
     function setupTeachers(address[] memory _teacher) onlyRole(CHAIRMAN_ROLE) public returns(bool){
         for(uint i = 0; i < _teacher.length; i++){
-            _grantRole(TEACHER_ROLE, _teacher[i]);
+            grantRole(TEACHER_ROLE, _teacher[i]);
         }
+        emit SetUpTeacher(_teacher);
         return true;
     }
 
-    function registerStudent(address[] memory _student) onlyRole(CHAIRMAN_ROLE) onlyRole(TEACHER_ROLE) public returns(bool){
+    /// @notice registers student
+    /// @dev only TEACHER_ROLE can call this method
+    /// @param _student array of address
+    function registerStudent(address[] memory _student) onlyRole(TEACHER_ROLE) public returns(bool){
         for(uint i = 0; i < _student.length; i++){
-            _grantRole(STUDENT_ROLE, _student[i]);
+            grantRole(STUDENT_ROLE, _student[i]);
         }
+        emit registerStudent(_student);
         return true;
+        
     }
 
+
+    /// @notice setup directors
+    /// @dev only CHAIRMAN_ROLE can call this method
+    /// @param _Bod array of address
     function setupBOD(address[] memory _Bod) onlyRole(CHAIRMAN_ROLE) public returns(bool){
         for(uint i = 0; i < _Bod.length; i < i++){
-            _grantRole(DIRECTOR_ROLE, _Bod[i]);
+            grantRole(DIRECTOR_ROLE, _Bod[i]);
         }
+        emit setupBOD(_Bod);
         return true;
     }
 
-    function vote(string memory _participantsName) public onlyRole(STUDENT_ROLE) onlyRole(TEACHER_ROLE) onlyRole(CHAIRMAN_ROLE) onlyRole(DIRECTOR_ROLE) whenNotPaused returns(bool){
+    /**
+     * @dev Triggers stopped state.
+     *
+     * Requirements:
+     *
+     * - The contract must not be paused.
+     * - only CHAIRMAN_ROLE can call this method
+     */
+    function pause() external onlyRole(CHAIRMAN_ROLE) returns(bool){
+        _pause();
+        return true;
+    }
+
+    /**
+     * @dev Returns to normal state.
+     *
+     * Requirements:
+     *
+     * - The contract must be paused.
+     * - only CHAIRMAN_ROLE can call this method
+     */
+    function unpause() external onlyRole(CHAIRMAN_ROLE) returns(bool){
+        _unpause();
+        return true;
+    }
+
+
+    /// @notice for voting
+    /// @dev allRole can call this function
+    /// @param _participantsName a string
+    function vote(string memory _participantsName) public allRole()  whenNotPaused returns(bool){
         if(voterStatus[msg.sender] == true) revert AlreadyVoted();
         uint currentVote = voteCount[_participantsName];
         voteCount[_participantsName] = currentVote + 1;
         voterStatus[msg.sender] = true;
+
+        emit Vote(_participantsName, msg.sender);
         return true;
     }
 
-    function compileResult() public onlyRole(TEACHER_ROLE) onlyRole(CHAIRMAN_ROLE) returns(Candidates[] memory){
+
+    /// @notice for compiling vote
+    /// @dev only CHAIRMAN_ROLE and TEACHER_ROLE can call this function
+    function compileResult() public onlyChairmanAndTeacherRole() returns(Candidates[] memory){
         for(uint i = 0; i < contestantsName.length; i++){
             Candidates storage _candidates = candidates[contestantsName[i]];
             _candidates.voteCount = voteCount[contestantsName[i]];
@@ -80,17 +149,23 @@ contract Election is Pausable, ElectionAccessControl{
         return results;
     }
 
-    function showResult() onlyRole(CHAIRMAN_ROLE) public returns(bool){
+    /// @notice for making result public
+    /// @dev allrole except STUDENT_ROLE can call this function
+    function showResult() onlyChairmanAndTeacherAndDirectorRole() public returns(bool){
         resultStatus = true;
         return true;
     }
 
+    /// @notice for viewing results
+    /// @dev resultStatus must be true to view the result
     function result() public view returns(Candidates[] memory){
         if(resultStatus == false) revert ResultNotYetRelease();
         return results;
     }
 
-    function privateViewResult() onlyRole(TEACHER_ROLE) onlyRole(CHAIRMAN_ROLE) public view returns(Candidates[] memory){
+    /// @notice for privateViewing results
+    /// @dev allRole except STUDENT_ROLE can call this method
+    function privateViewResult() onlyChairmanAndTeacherAndDirectorRole() public  view returns(Candidates[] memory){
         return results;
     }
 }
