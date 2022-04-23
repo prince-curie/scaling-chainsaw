@@ -40,17 +40,28 @@ contract Election is Pausable, ElectionAccessControl {
     }
     
     modifier allRole() {
-        require(hasRole(CHAIRMAN_ROLE, msg.sender) == true || hasRole(TEACHER_ROLE, msg.sender) == true || hasRole(STUDENT_ROLE, msg.sender) == true || hasRole(DIRECTOR_ROLE, msg.sender) == true, "ACCESS DENIED");
+        require(
+            hasRole(CHAIRMAN_ROLE, msg.sender) == true || 
+            hasRole(TEACHER_ROLE, msg.sender) == true || 
+            hasRole(STUDENT_ROLE, msg.sender) == true || 
+            hasRole(DIRECTOR_ROLE, msg.sender) == true, "ACCESS DENIED");
         _;
     }
 
     modifier onlyChairmanAndTeacherRole () {
-        require(hasRole(CHAIRMAN_ROLE, msg.sender) == true || hasRole(TEACHER_ROLE, msg.sender) == true, "ACCESS FOR TEACHER(s) AND CHAIRMAN ONLY" );
+        require(
+            hasRole(CHAIRMAN_ROLE, msg.sender) == true || 
+            hasRole(TEACHER_ROLE, msg.sender) == true, 
+            "ACCESS FOR TEACHER(s) AND CHAIRMAN ONLY" );
         _;
     }
 
     modifier onlyChairmanAndTeacherAndDirectorRole() {
-        require(hasRole(CHAIRMAN_ROLE, msg.sender) == true || hasRole(TEACHER_ROLE, msg.sender) == true || hasRole(DIRECTOR_ROLE,msg.sender) == true, "ACCESS FOR TEACHER(s) AND CHAIRMAN ONLY" );
+        require(
+            hasRole(CHAIRMAN_ROLE, msg.sender) == true || 
+            hasRole(TEACHER_ROLE, msg.sender) == true || 
+            hasRole(DIRECTOR_ROLE,msg.sender) == true, 
+            "ACCESS FOR TEACHER(s) AND CHAIRMAN ONLY" );
         _;
     }
 
