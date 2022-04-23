@@ -1,21 +1,39 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity 0.8.0;
 
-import "hardhat/console.sol";
-import "@openzeppelin/contracts/security/Pausable.sol";
-import "./ElectionAccessControl.sol";
+import '@openzeppelin/contracts/security/Pausable.sol';
+import './ElectionAccessControl.sol';
+import "./interfaces/IElectionFactory.sol";
 
-contract Election is Pausable, ElectionAccessControl {
+contract Election is Pausable, ElectionAccessControl{
+
     string position;
     uint256 noOfpartcipate;
     string[] contestantsName;
     bool electionStatus;
     bool resultStatus;
 
+    /// @dev Timestamps for when the election started and ended
+    uint256 public startAt;
+    uint256 public endAt;
+    uint256 public resultReadyAt;
+
+    /// @notice Election status
+    string constant private PENDING = 'Pending';
+    string constant private STARTED = 'Started';
+    string constant private ENDED = 'Ended';
+    string constant private RESULTS_READY = 'Results ready';
+
+    uint256 immutable index;
+    address immutable electionFactory;
+
     error NoOfParticatantNotMatchingParticipateName();
     error AlreadyVoted();
     error ResultNotYetRelease();
     error AccessDenied();
+    error VotingNotAllowed();
+    error VotingNotStarted();
+    error VotingEnd();
 
     struct Candidates {
         string candidatesName;
@@ -29,13 +47,13 @@ contract Election is Pausable, ElectionAccessControl {
 
     /// ======================= MODIFIERS =================================
     ///@notice modifier to specify that election has not ended
-    modifier electionIsStillOn() {
-        require(!Ended, "Sorry, the Election has ended!");
+    modifier electionHasEnded() {
+        require(startAt > endAt, "Sorry, the Election has ended!");
         _;
     }
     ///@notice modifier to check that election is active
     modifier electionIsActive() {
-        require(Active, "Election has not begun!");
+        require(startAt > 0 , "Election has not begun!");
         _;
     }
     
@@ -72,18 +90,27 @@ contract Election is Pausable, ElectionAccessControl {
     event RegisterTeacher(address[] student);
     event SetUpDirector(address[] director);
     event Vote(string candidates, address voter);
+    event StartVoting(uint256 startAt);
+    event EndVoting(uint256 endAt);
+    event SetUpBOD(address[] _Bod);
+    event RegisterStudent(address[] _student);
 
     constructor(
         address _owner,
         string memory _position,
-        uint _noOfParticipants,
-        string[] memory _contestants
-        ) ElectionAccessControl(_owner) {
-        if(_noOfParticipants != _contestants.length) 
+        uint256 _noOfParticipants,
+        string[] memory _contestants,
+        uint256 _index, 
+        address _electionFactory
+    ) ElectionAccessControl(_owner) {
+        if (_noOfParticipants != _contestants.length)
             revert NoOfParticatantNotMatchingParticipateName();
+
         position = _position;
         noOfpartcipate = _noOfParticipants;
         contestantsName = _contestants;
+        index = _index;
+        electionFactory = _electionFactory;
 
         for (uint256 i = 0; i < _contestants.length; i++) {
             Candidates storage _candidates = candidates[_contestants[i]];
@@ -118,7 +145,7 @@ contract Election is Pausable, ElectionAccessControl {
         for(uint i = 0; i < _student.length; i++){
             grantRole(STUDENT_ROLE, _student[i]);
         }
-        emit registerStudent(_student);
+        emit RegisterStudent(_student);
         return true;
         
     }
@@ -135,7 +162,7 @@ contract Election is Pausable, ElectionAccessControl {
         for(uint i = 0; i < _Bod.length; i < i++){
             grantRole(DIRECTOR_ROLE, _Bod[i]);
         }
-        emit setupBOD(_Bod);
+        emit SetUpBOD(_Bod);
         return true;
     }
 
@@ -165,12 +192,22 @@ contract Election is Pausable, ElectionAccessControl {
         return true;
     }
 
+    /// @notice Ensures that voting begins
+    function enableVoting() external onlyRole(CHAIRMAN_ROLE) {
+        startAt = block.timestamp;
+
+        _updateStatusOnFactory(STARTED);
+
+        emit StartVoting(block.timestamp);
+    }
 
     /// @notice for voting
     /// @dev allRole can call this function
     /// @param _participantsName a string
     function vote(string memory _participantsName)
-        public allRole()  
+        public allRole() 
+        electionIsActive
+        electionHasEnded
         whenNotPaused 
         returns(bool)
     {
@@ -183,7 +220,16 @@ contract Election is Pausable, ElectionAccessControl {
         return true;
     }
 
+    function disableVoting() external onlyRole(CHAIRMAN_ROLE) {
+        if(endAt == startAt)
+            revert VotingNotStarted();
 
+        endAt = block.timestamp;
+
+        _updateStatusOnFactory(ENDED);
+
+        emit EndVoting(block.timestamp);
+    }
 
     /// @notice for compiling vote
     /// @dev only CHAIRMAN_ROLE and TEACHER_ROLE can call this function
@@ -205,6 +251,11 @@ contract Election is Pausable, ElectionAccessControl {
     /// @dev allrole except STUDENT_ROLE can call this function
     function showResult() onlyChairmanAndTeacherAndDirectorRole() public returns(bool){
         resultStatus = true;
+
+        _updateStatusOnFactory(RESULTS_READY);
+
+        resultReadyAt = block.timestamp;
+
         return true;
     }
 
@@ -219,5 +270,10 @@ contract Election is Pausable, ElectionAccessControl {
     /// @dev allRole except STUDENT_ROLE can call this method
     function privateViewResult()  public view onlyChairmanAndTeacherAndDirectorRole()returns(Candidates[] memory){
         return results;
+    }
+
+    /// @dev Makes call to the election factory to update the status of an election.
+    function _updateStatusOnFactory(string memory _status) internal {
+        IElectionFactory(electionFactory).updateElectionStatus(index, _status);
     }
 }
