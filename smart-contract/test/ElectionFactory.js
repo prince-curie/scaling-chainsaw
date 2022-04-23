@@ -84,7 +84,7 @@ describe('Election factory', function() {
 
         it("ElectionLength must be equal to length of Elections Array", async function(){
             const arrayLength = await contract.elections.length;
-            const getter = await contract.getElections.electionsLength;
+            const getter = await contract.getElections().electionsLength;
             await expect(arrayLength).to.be.equal(getter);
         })
     })
