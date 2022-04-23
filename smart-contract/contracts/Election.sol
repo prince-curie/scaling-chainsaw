@@ -23,11 +23,10 @@ contract Election is Pausable, ElectionAccessControl{
     string constant private STARTED = 'Started';
     string constant private ENDED = 'Ended';
     string constant private RESULTS_READY = 'Results ready';
-
     uint256 immutable index;
     address immutable electionFactory;
 
-    error NoOfParticatantNotMatchingParticipateName();
+   error NoOfParticatantNotMatchingParticipateName();
     error AlreadyVoted();
     error ResultNotYetRelease();
     error AccessDenied();

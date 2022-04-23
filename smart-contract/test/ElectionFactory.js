@@ -64,4 +64,29 @@ describe('Election factory', function() {
             expect(newCount).to.be.gt(ethers.BigNumber.from(count));
         })
     })
+
+    describe("ElectionFactory - getElections" ,function(){
+        let start, length;
+
+        beforeEach(function(){
+            start = 1;
+            length = 20;
+        })
+
+        it("Should revert when a non-owner calls it", async function(){
+             await expect(contract.connect(newOwner).getElections(start, length)).to.be.reverted;
+        })
+
+        it("Should revert when caller sets start to 0", async function(){
+            const newStart = 0;
+            await expect(contract.getElections(newStart, length)).to.be.reverted;
+        })
+
+        it("ElectionLength must be equal to length of Elections Array", async function(){
+            const arrayLength = await contract.elections.length;
+            const getter = await contract.getElections.electionsLength;
+            await expect(arrayLength).to.be.equal(getter);
+        })
+    })
+
 })
