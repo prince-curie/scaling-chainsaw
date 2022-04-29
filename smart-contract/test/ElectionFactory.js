@@ -65,3 +65,83 @@ describe('Election factory', function() {
         })
     })
 })
+
+describe('Election factory - Update election', function() {
+    let election, electionfactory;
+    let chairman, teacher;
+    let electionAddress;
+    let electionIndex; 
+    let position = "head boy";
+    const contestant1 = "Godwill";
+    const contestant2 = "Prince";
+    const contestants = [contestant1, contestant2];
+
+    beforeEach( async function() {
+        [chairman, teacher] = await ethers.getSigners()
+        
+        const ElectionFactory = await ethers.getContractFactory("ElectionFactory")
+        electionfactory = await ElectionFactory.deploy();
+        await electionfactory.deployed()
+        
+        await electionfactory.createElection(position, contestants)
+        
+        const createElectionEvent = await electionfactory.queryFilter('CreateElection');
+        
+        electionIndex = createElectionEvent[0].args[0].toNumber();
+        electionAddress = createElectionEvent[0].args[1];
+        
+    })
+
+    it('Should fail to update status of an election', async function() {
+        await expect(electionfactory.updateElectionStatus(electionIndex, "Started")).to.be.reverted
+    })
+})
+
+describe("Election factory - get elections", function() {
+    let electionfactory, chairman, teacher;
+    let position = "head boy";
+    const contestant1 = "Godwill";
+    const contestant2 = "Prince";
+    const contestants = [contestant1, contestant2];
+    const noOfElections = 3
+
+    beforeEach( async function() {
+        [chairman, teacher] = await ethers.getSigners()
+        
+        const ElectionFactory = await ethers.getContractFactory("ElectionFactory")
+        electionfactory = await ElectionFactory.deploy();
+        await electionfactory.deployed()
+
+        for(let i = 0; i < noOfElections; i++) {
+            await electionfactory.createElection(position, contestants);
+        }
+    })
+
+    it("Should revert if the start is placed at zero(0)", async function() {
+        await expect(electionfactory.getElections(0, 10)).to.be.reverted;
+    })
+
+    it("Should get all elections successfully", async function() {
+        const result = await electionfactory.getElections(1, noOfElections);     
+        
+        expect(result).to.be.an('array');
+        expect(result[0].length).to.equal(noOfElections);
+    })
+
+    it("Should get only specified number of elections successfully", async function() {
+        const result = await electionfactory.getElections(1, noOfElections - 1);     
+        
+        expect(result).to.be.an('array');
+        expect(result[0].length).to.equal(noOfElections - 1);
+    })
+
+    it("Should get only available number of elections successfully", async function() {
+        const length = 10;
+
+        const result = await electionfactory.getElections(1, length);     
+        
+        expect(result).to.be.an('array');
+        expect(result[0].length).to.equal(noOfElections);
+        expect(result[0].length).to.not.equal(length);
+    })
+})

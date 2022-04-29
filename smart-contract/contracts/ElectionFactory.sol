@@ -18,7 +18,7 @@ contract ElectionFactory {
         uint256 createdAt;
         string status;
     }
-    ElectionDetails[] private elections;
+    ElectionDetails[] public elections;
     
     /// @notice Number of elections conducted
     uint256 public electionCount;
