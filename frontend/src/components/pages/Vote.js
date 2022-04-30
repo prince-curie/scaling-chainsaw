@@ -7,8 +7,9 @@ import {ethers} from 'ethers'
 import electionabi from '../abi/Election.json'
 import Web3Modal from 'web3modal';
 import Input from '../input';
-import { Button } from '@chakra-ui/react';
-
+import { Button, Center } from '@chakra-ui/react';
+import { useWeb3React } from '@web3-react/core';
+import { connectors } from '../connector';
 
 
 const Vote = () => {
@@ -18,6 +19,7 @@ const Vote = () => {
 	const [address, setAddress] = useState()
 	const [contestant, setContestant] = useState([])
 	const [ElectionResult, setElectionResult] = useState()
+	const {active, activate} = useWeb3React()
 
 	async function loader (){
 		const web3Modal = new Web3Modal()
@@ -57,6 +59,8 @@ const Vote = () => {
 
 
 	return (
+		<Center>
+		{active ?
 		<div>
 		{positions.map((position,i) => (
 		<div className="w-full px-4 pt-8">
@@ -96,7 +100,10 @@ const Vote = () => {
 		  </div>
 		</div> 
 		))}
-		</div>
+		</div>: <Button className='text-center' onClick={() => {
+			activate(connectors.injected)
+		}}>Connect Wallet</Button>}
+		</Center>
 		
 	)
 }

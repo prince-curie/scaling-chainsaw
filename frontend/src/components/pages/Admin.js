@@ -11,6 +11,7 @@ import {
     Button, 
     Input,
     Stack,
+    useToast
   } from '@chakra-ui/react'
   import { ethers } from 'ethers';
   import Web3Modal from 'web3modal';
@@ -27,10 +28,10 @@ const Admin = () => {
     const [ContestantOne, setContestantOne] = useState()
     const [ContestantTwo, setContestantTwo] = useState()
     const [positions, setPositions] = useState([])
-	const [status, setStatus] = useState()
-	const [address, setAddress] = useState()
+	  const [status, setStatus] = useState()
+	  const [address, setAddress] = useState()
     const btnRef = React.useRef()
-
+    const toast = useToast()
    
 
     const handlePosition = (e) => {
@@ -46,19 +47,24 @@ const Admin = () => {
     }
 
     async function createElection (){
-        const contestant = []
-		const web3Modal = new Web3Modal()
-		const connection = await web3Modal.connect()
-		const provider = new ethers.providers.Web3Provider(connection)
-        const signer = provider.getSigner()
-		const electionfactory = new ethers.Contract("0x618Fe346C9373689E423055DC8c225349D98b20b", electionfactoryabi, signer);
-        contestant.push(ContestantOne)
-        contestant.push(ContestantTwo)
-        console.log(position, contestant)
+      const contestant = []
+		  const web3Modal = new Web3Modal()
+		  const connection = await web3Modal.connect()
+		  const provider = new ethers.providers.Web3Provider(connection)
+      const signer = provider.getSigner()
+		  const electionfactory = new ethers.Contract("0x618Fe346C9373689E423055DC8c225349D98b20b", electionfactoryabi, signer);
+      contestant.push(ContestantOne)
+      contestant.push(ContestantTwo)
        try {
-            await electionfactory.createElection(position, contestant);
-       } catch (error) {
-           console.error(error)
+          await electionfactory.createElection(position, contestant);
+          toast({
+            title:'Election Created',
+            position: 'top',
+            isClosable: true,
+            status: 'success'
+          })
+        } catch (error) {
+          console.error(error)
        }
 	}
 

@@ -4,13 +4,14 @@ import { CheckIcon, SelectorIcon } from '@heroicons/react/solid'
 import {ethers} from 'ethers'
 import electionabi from '../components/abi/Election.json'
 import Web3Modal from 'web3modal';
-import {useWeb3React} from '@web3-react/core'
-import {Button} from '@chakra-ui/react'
+
+import {Button, useToast} from '@chakra-ui/react'
 
 export default function Input(address) {
     const [people, setPeople] = useState([])
     const [voting, setVoting] = useState()
-
+    const toast = useToast()
+    
      
     const getContestant = async ({address}) => {
 		const web3Modal = new Web3Modal()
@@ -27,7 +28,6 @@ export default function Input(address) {
       }
 
 		setPeople(contestantsName)
-    console.log(people)
 
 		} catch (error) {
 		    console.error(error, "why")
@@ -57,13 +57,19 @@ export default function Input(address) {
         await election.vote(selected, {
             gasLimit:300000
         })
+        toast({
+          title:'Vote SuccessFul',
+          position: 'top',
+          isClosable: true,
+          status: 'success'
+        })
     } catch (error) {
        console.error(error, "why") 
     }
 }
 
   return (
-    <div className=''>
+      <div className=''>
       <Listbox value={selected} onChange={setSelected}>
         <div className="relative mt-1">
           <Listbox.Button className="focus:outline-none relative w-1/2 cursor-default rounded-lg bg-black py-2 pl-3 pr-10 text-left shadow-md focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
@@ -116,9 +122,7 @@ export default function Input(address) {
           vote(address, selected)
       }}>Vote</Button>
         </div>
-        
       </Listbox>
-     
-    </div>
+    </div> 
   )
 }
