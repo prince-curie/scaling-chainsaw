@@ -214,7 +214,7 @@ const AdminFunction = (address) => {
                 }}>showResult</Button>
                 <Button onClick={() => {
                     privateViewResult(address)
-                }}>showResult</Button>
+                }}>privateViewResult</Button>
                 {/* <VStack>
                     <Input onChange={handleStudent} placeholder='setupStudent'  />
                     <Button onClick={() => {
