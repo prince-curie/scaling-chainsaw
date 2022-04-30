@@ -8,7 +8,7 @@ import { connectors } from './connector';
 import {ethers} from 'ethers'
 import Web3Modal from "web3modal";
 import {
-	ChakraProvider,
+	
 	Box,
 	Spacer,
 	HStack,
@@ -75,7 +75,7 @@ const disconnect = () => {
 
 	console.log(account, active, chainId)
 	return (
-		<ChakraProvider theme={theme}>
+		
 		<div className='navbar'>
 			<div className='navbar-links'>
 				<div className='navbar-links_logo'>
@@ -121,7 +121,7 @@ const disconnect = () => {
 				)}
 			</div> */}
 		</div>
-		</ChakraProvider>
+		
 	);
 };
 
