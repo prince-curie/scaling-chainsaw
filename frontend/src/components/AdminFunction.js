@@ -199,12 +199,12 @@ const AdminFunction = (address) => {
                 <Button onClick={() => {
                     privateViewResult(address)
                 }}>showResult</Button>
-                <VStack>
+                {/* <VStack>
                     <Input onChange={handleStudent} placeholder='setupStudent'  />
                     <Button onClick={() => {
                         registerStudent(address)
                     }}>setupStudent</Button>
-                </VStack>
+                </VStack> */}
             </HStack>
         </div>
     )
