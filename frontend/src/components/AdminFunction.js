@@ -70,7 +70,7 @@ const AdminFunction = (address) => {
         const election = new ethers.Contract(address,electionabi.abi, signer)
         console.log(Student)
         try {
-            await election.registerStudent(Student, {
+            await election.registerStudent(addresses, {
                 gasLimit:300000
             })
         } catch (error) {
@@ -205,6 +205,26 @@ const AdminFunction = (address) => {
                         registerStudent(address)
                     }}>setupStudent</Button>
                 </VStack> */}
+                <VStack>
+                <Upload
+                    accept=".csv,.xlsx,.xls"
+                    action="#"
+                    listType="picture-card"
+                    fileList={customersCsvFile}
+                    onChange={handleChange}
+                    beforeUpload={() => false}
+                    maxCount={1}
+                  >
+                    {customersCsvFile.length === 0 && (
+                      <div>
+                        <div style={{ marginTop: 8 }}>Upload Student</div>
+                      </div>
+                    )}
+                  </Upload>
+                  <Button onClick={() => {
+                      registerStudent(address)
+                  }}>register</Button>
+                  </VStack>
             </HStack>
         </div>
     )
