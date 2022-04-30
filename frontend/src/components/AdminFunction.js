@@ -38,7 +38,7 @@ const AdminFunction = (address) => {
         const election = new ethers.Contract(address,electionabi.abi, signer)
         
         try {
-            await election.enableVoting( {
+            await election.disableVoting( {
                 gasLimit:300000
             })
         } catch (error) {
@@ -199,12 +199,12 @@ const AdminFunction = (address) => {
                 <Button onClick={() => {
                     privateViewResult(address)
                 }}>showResult</Button>
-                <VStack>
+                {/* <VStack>
                     <Input onChange={handleStudent} placeholder='setupStudent'  />
                     <Button onClick={() => {
                         registerStudent(address)
                     }}>setupStudent</Button>
-                </VStack>
+                </VStack> */}
             </HStack>
         </div>
     )
