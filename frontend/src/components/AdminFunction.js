@@ -1,5 +1,5 @@
 import electionabi from '../components/abi/Election.json'
-import {Button, Input, Stack, HStack} from '@chakra-ui/react'
+import {Button, Input, Stack, HStack, VStack} from '@chakra-ui/react'
 import {Upload} from 'antd'
 import { useState } from 'react'
 import {ethers} from 'ethers'
@@ -10,7 +10,9 @@ const AdminFunction = (address) => {
 
     const [addresses, setAddresses] = useState([]);
     const [customersCsvFile, setCustomersCsvFile] = useState([]);
-    const handleTeachers = () => {
+    const [Student, setStudent] = useState([])
+    const handleStudent = (e) => {
+        setStudent(e.target.value)
     }
     const enableVoting = async ({address} ) => {
         const web3Modal = new Web3Modal()
@@ -53,6 +55,22 @@ const AdminFunction = (address) => {
         
         try {
             await election.compileResult( {
+                gasLimit:300000
+            })
+        } catch (error) {
+           console.error(error, "why") 
+        }
+    }
+
+    const registerStudent = async ({address} ) => {
+        const web3Modal = new Web3Modal()
+        const connection = await web3Modal.connect()
+        const provider = new ethers.providers.Web3Provider(connection)
+        const signer = provider.getSigner()
+        const election = new ethers.Contract(address,electionabi.abi, signer)
+        console.log(Student)
+        try {
+            await election.registerStudent(Student, {
                 gasLimit:300000
             })
         } catch (error) {
@@ -181,6 +199,12 @@ const AdminFunction = (address) => {
                 <Button onClick={() => {
                     privateViewResult(address)
                 }}>showResult</Button>
+                <VStack>
+                    <Input onChange={handleStudent} placeholder='setupStudent'  />
+                    <Button onClick={() => {
+                        registerStudent(address)
+                    }}>setupStudent</Button>
+                </VStack>
             </HStack>
         </div>
     )
