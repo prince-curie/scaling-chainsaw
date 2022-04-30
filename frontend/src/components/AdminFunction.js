@@ -38,7 +38,7 @@ const AdminFunction = (address) => {
         const election = new ethers.Contract(address,electionabi.abi, signer)
         
         try {
-            await election.enableVoting( {
+            await election.disableVoting( {
                 gasLimit:300000
             })
         } catch (error) {
