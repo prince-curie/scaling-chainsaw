@@ -80,7 +80,7 @@ const disconnect = () => {
 					activate(connectors.injected)
 					setProvider('injected')
 				}}>Connect Wallet</Button>):
-                chainId != 3 ? <Box bg='red.400' p={3} color='white'> <Text as='cite' fontSize='md'> You are on the wrong network</Text> </Box> : 
+                chainId != 3 ? <Box bg='red.400' p={3} color='white'> <Text as='cite' fontSize='md'> You are on the wrong network connect to ropsten</Text> </Box> : 
                 <HStack>
                  <Button colorScheme='teal' onClick={disconnect}>Disconnect</Button>
                  <Tooltip label={account} placement='right'>
