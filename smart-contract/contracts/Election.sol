@@ -8,11 +8,12 @@ import "./interfaces/IElectionFactory.sol";
 contract Election is Pausable, ElectionAccessControl{
 
     string position;
-    uint256 noOfpartcipate;
-    string[] contestantsName;
-    bool resultStatus;
+    
+    string[] public contestantsName;
+    bool public resultStatus;
+    uint256 public noOfpartcipate;
 
-    /// @dev Timestamps for when the election started and ended
+    /// @dev Timestamps 
     uint256 public startAt;
     uint256 public endAt;
     uint256 public resultReadyAt;
@@ -292,4 +293,5 @@ contract Election is Pausable, ElectionAccessControl{
     function _updateStatusOnFactory(string memory _status) internal {
         IElectionFactory(electionFactory).updateElectionStatus(index, _status);
     }
+
 }

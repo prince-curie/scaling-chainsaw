@@ -8,19 +8,11 @@ import { connectors } from './connector';
 import {ethers} from 'ethers'
 import Web3Modal from "web3modal";
 import {
-	ChakraProvider,
 	Box,
-	Spacer,
 	HStack,
-	Code,
-	Flex,
 	Button,
-	useDisclosure,
 	Text,
 	Tooltip,
-	Input,
-	List,
-	ListItem,
   } from '@chakra-ui/react';
   import theme from './theme';
 
@@ -75,7 +67,7 @@ const disconnect = () => {
 
 	console.log(account, active, chainId)
 	return (
-		<ChakraProvider theme={theme}>
+		
 		<div className='navbar'>
 			<div className='navbar-links'>
 				<div className='navbar-links_logo'>
@@ -88,7 +80,7 @@ const disconnect = () => {
 					activate(connectors.injected)
 					setProvider('injected')
 				}}>Connect Wallet</Button>):
-                chainId != 4 ? <Box bg='red.400' p={3} color='white'> <Text as='cite' fontSize='md'> You are on the wrong network</Text> </Box> : 
+                chainId != 3 ? <Box bg='red.400' p={3} color='white'> <Text as='cite' fontSize='md'> You are on the wrong network connect to ropsten</Text> </Box> : 
                 <HStack>
                  <Button colorScheme='teal' onClick={disconnect}>Disconnect</Button>
                  <Tooltip label={account} placement='right'>
@@ -121,7 +113,7 @@ const disconnect = () => {
 				)}
 			</div> */}
 		</div>
-		</ChakraProvider>
+		
 	);
 };
 
