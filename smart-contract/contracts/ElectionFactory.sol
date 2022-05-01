@@ -25,9 +25,6 @@ contract ElectionFactory {
 
     /// @notice Election status
     string constant private PENDING = 'Pending';
-    string constant private STARTED = 'Started';
-    string constant private ENDED = 'Ended';
-    string constant private RESULTS_READY = 'Results ready';
 
     event SetOwner(address indexed oldOwner, address indexed newOwner);
     event CreateElection(uint256 id, address electionAddress, address indexed creator, string position);

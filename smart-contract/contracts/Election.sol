@@ -10,7 +10,6 @@ contract Election is Pausable, ElectionAccessControl{
     string position;
     uint256 noOfpartcipate;
     string[] contestantsName;
-    bool electionStatus;
     bool resultStatus;
 
     /// @dev Timestamps for when the election started and ended
@@ -19,7 +18,6 @@ contract Election is Pausable, ElectionAccessControl{
     uint256 public resultReadyAt;
 
     /// @notice Election status
-    string constant private PENDING = 'Pending';
     string constant private STARTED = 'Started';
     string constant private ENDED = 'Ended';
     string constant private RESULTS_READY = 'Results ready';
@@ -39,30 +37,41 @@ contract Election is Pausable, ElectionAccessControl{
         string candidatesName;
         uint256 voteCount;
     }
+    mapping(string => Candidates) candidates;
 
     mapping(address => bool) public voterStatus;
-    mapping(string => Candidates) candidates;
     mapping(string => uint256) voteCount;
     Candidates[] results;
 
     /// ======================= MODIFIERS =================================
     ///@notice modifier to specify that election has not ended
     modifier electionHasEnded() {
-        require(startAt > endAt, "Sorry, the Election has ended!");
+        if(startAt < endAt) {
+            revert VotingEnd();
+        }
         _;
     }
     ///@notice modifier to check that election is active
     modifier electionIsActive() {
-        require(startAt > 0 , "Election has not begun!");
+        if(startAt == 0) {
+            revert VotingNotStarted();
+        }
         _;
     }
     
     modifier allRole() {
-        require(
-            hasRole(CHAIRMAN_ROLE, msg.sender) == true || 
-            hasRole(TEACHER_ROLE, msg.sender) == true || 
-            hasRole(STUDENT_ROLE, msg.sender) == true || 
-            hasRole(DIRECTOR_ROLE, msg.sender) == true, "ACCESS DENIED");
+        // require(
+            // hasRole(CHAIRMAN_ROLE, msg.sender) == true || 
+            // hasRole(TEACHER_ROLE, msg.sender) == true || 
+            // hasRole(STUDENT_ROLE, msg.sender) == true || 
+            // hasRole(DIRECTOR_ROLE, msg.sender) == true, "ACCESS DENIED");
+        if(hasRole(CHAIRMAN_ROLE, msg.sender) != true && 
+            hasRole(TEACHER_ROLE, msg.sender) != true && 
+            hasRole(STUDENT_ROLE, msg.sender) != true && 
+            hasRole(DIRECTOR_ROLE, msg.sender) != true)
+        {
+            revert AccessDenied();
+        }
         _;
     }
 
@@ -124,41 +133,41 @@ contract Election is Pausable, ElectionAccessControl{
 /// @notice setup teachers
 /// @dev only CHAIRMAN_ROLE can call this method
 /// @param _teacher array of address
-    function setupTeachers(address[] memory _teacher) onlyRole(CHAIRMAN_ROLE) public returns(bool){
+    function setupTeachers(address[] memory _teacher) onlyRole(CHAIRMAN_ROLE) public {
         for(uint i = 0; i < _teacher.length; i++){
             grantRole(TEACHER_ROLE, _teacher[i]);
         }
 
         emit SetUpTeacher(_teacher);
         
-        return true;
+        // return true;
     }
 
     /// @notice registers student
     /// @dev only TEACHER_ROLE can call this method
     /// @param _student array of address
-    function registerStudent(address[] memory _student) public  onlyRole(TEACHER_ROLE)  returns(bool) {
+    function registerStudent(address[] memory _student) public  onlyRole(TEACHER_ROLE) {
         for(uint i = 0; i < _student.length; i++){
             grantRole(STUDENT_ROLE, _student[i]);
         }
 
         emit RegisterStudent(_student);
         
-        return true;
+        // return true;
     }
 
 
     /// @notice setup directors
     /// @dev only CHAIRMAN_ROLE can call this method
     /// @param _Bod array of address
-    function setupBOD(address[] memory _Bod) public onlyRole(CHAIRMAN_ROLE) returns(bool) {
+    function setupBOD(address[] memory _Bod) public onlyRole(CHAIRMAN_ROLE) {
         for(uint i = 0; i < _Bod.length; i < i++){
             grantRole(DIRECTOR_ROLE, _Bod[i]);
         }
 
         emit SetUpBOD(_Bod);
         
-        return true;
+        // return true;
     }
 
     /**
@@ -169,9 +178,9 @@ contract Election is Pausable, ElectionAccessControl{
      * - The contract must not be paused.
      * - only CHAIRMAN_ROLE can call this method
      */
-    function pause() external onlyRole(CHAIRMAN_ROLE) returns(bool){
+    function pause() external onlyRole(CHAIRMAN_ROLE) {
         _pause();
-        return true;
+        // return true;
     }
 
     /**
@@ -182,9 +191,9 @@ contract Election is Pausable, ElectionAccessControl{
      * - The contract must be paused.
      * - only CHAIRMAN_ROLE can call this method
      */
-    function unpause() external onlyRole(CHAIRMAN_ROLE) returns(bool){
+    function unpause() external onlyRole(CHAIRMAN_ROLE) {
         _unpause();
-        return true;
+        // return true;
     }
 
     /// @notice Ensures that voting begins
@@ -205,7 +214,6 @@ contract Election is Pausable, ElectionAccessControl{
         electionIsActive
         electionHasEnded
         whenNotPaused 
-        returns(bool)
     {
         if(voterStatus[msg.sender] == true) revert AlreadyVoted();
         uint currentVote = voteCount[_participantsName];
@@ -213,7 +221,7 @@ contract Election is Pausable, ElectionAccessControl{
         voterStatus[msg.sender] = true;
 
         emit Vote(msg.sender);
-        return true;
+        // return true;
     }
 
     function disableVoting() external onlyRole(CHAIRMAN_ROLE) {
@@ -253,7 +261,7 @@ contract Election is Pausable, ElectionAccessControl{
 
     /// @notice for making result public
     /// @dev allrole except STUDENT_ROLE can call this function
-    function showResult() onlyChairmanAndTeacherAndDirectorRole() public returns(bool){
+    function showResult() onlyChairmanAndTeacherAndDirectorRole() public {
         require(results.length > 0, "Result has not been compiled");
 
         resultStatus = true;
@@ -264,7 +272,7 @@ contract Election is Pausable, ElectionAccessControl{
 
         emit ShowResult(msg.sender, resultReadyAt);
 
-        return true;
+        // return true;
     }
 
     /// @notice for viewing results
