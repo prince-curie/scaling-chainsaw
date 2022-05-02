@@ -95,6 +95,17 @@ describe('Election factory - Update election', function() {
     it('Should fail to update status of an election', async function() {
         await expect(electionfactory.updateElectionStatus(electionIndex, "Started")).to.be.reverted
     })
+
+    it('Should successfully update the status of an election', async function() {
+        election = await ethers.getContractAt("Election", electionAddress, chairman);
+
+        const initialValue = await electionfactory.elections(electionIndex - 1);
+        await election.enableVoting();
+        const finalValue = await electionfactory.elections(electionIndex - 1);
+
+        expect(initialValue[4]).to.equal('Pending')
+        expect(finalValue[4]).to.equal('Started')
+    })
 })
 
 describe("Election factory - get elections", function() {

@@ -24,22 +24,21 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
  */
 module.exports = {
   solidity: {
-    version: "0.8.4",
-    // settings: {
-    //   optimizer: {
-    //     enabled: true,
-    //     runs: 200,
-    //   },
-    //   viaIR : true,
-    // }
+    version: "0.8.13",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 200,
+      },
+    }
   },
-  // networks: {
-  //   rinkeby: {
-  //     url: process.env.API_URL || "",
-  //     accounts:
-  //       process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
-  //   },
-  // },
+  networks: {
+    rinkeby: {
+      url: process.env.API_URL || "",
+      accounts:
+        process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+    },
+  },
   plugins: ["solidity-coverage"],
   gasReporter: {
     enabled: process.env.REPORT_GAS !== undefined,

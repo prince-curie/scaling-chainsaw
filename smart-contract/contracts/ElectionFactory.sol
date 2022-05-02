@@ -12,11 +12,11 @@ contract ElectionFactory {
 
     struct ElectionDetails {
         uint256 id;
+        uint256 createdAt;
         address electionAddress;
         string position;
-        string[] contestants;
-        uint256 createdAt;
         string status;
+        string[] contestants;
     }
     ElectionDetails[] public elections;
     
@@ -30,9 +30,9 @@ contract ElectionFactory {
     event CreateElection(uint256 id, address electionAddress, address indexed creator, string position);
     event UpdateElectionStatus(string status, address electionAddress);
 
-    error NotAuthorised(address caller);
+    error NotAuthorised();
     error UnAuthorizedElectionContract(address electionContract);
-    error BadStatusRequest(string status);
+    error BadRequest();
     
     constructor() {
         owner = msg.sender;
@@ -41,13 +41,13 @@ contract ElectionFactory {
     /// @dev Ensures that only the owner can call a function
     modifier onlyOwner() {
         if(msg.sender != owner) {
-            revert NotAuthorised(msg.sender);
+            revert NotAuthorised();
         }
         _;
     }
 
     /// @dev Sets a new owner
-    function setOwner(address _owner) public onlyOwner {
+    function setOwner(address _owner) external onlyOwner {
         owner = _owner;
 
         emit SetOwner(msg.sender, _owner);
@@ -58,12 +58,12 @@ contract ElectionFactory {
         uint256 count = electionCount;
         count++;
 
-        Election election = new Election(msg.sender, _position, _contestants.length, _contestants, count, address(this));
+        address election = address(new Election(msg.sender, _position, _contestants.length, _contestants, count, address(this)));
         
         ElectionDetails memory electionDetail;
 
         electionDetail.id = count;
-        electionDetail.electionAddress = address(election);
+        electionDetail.electionAddress = election;
         electionDetail.position = _position;
         electionDetail.contestants = _contestants;
         electionDetail.createdAt = block.timestamp;
@@ -73,7 +73,7 @@ contract ElectionFactory {
 
         electionCount = count;
 
-        emit CreateElection(count, address(election), msg.sender, _position);
+        emit CreateElection(count, election, msg.sender, _position);
     }
 
     /// @dev Called from the election contract to update the status of an election
@@ -102,7 +102,8 @@ contract ElectionFactory {
             string[] memory status 
         )
     {
-        require(_start > 0, "Caller cannot start from zero start from one");
+        if(_start == 0) 
+            revert BadRequest();
         
         uint256 electionsLength = elections.length;
         uint256 end = _start + _length;
