@@ -1,7 +1,6 @@
 const { expect, use } = require("chai");
 const { ethers } = require("hardhat");
 const { solidity } = require('ethereum-waffle');
-const { LogDescription } = require("ethers/lib/utils");
 
 const { BigNumber, getSigners, getContractFactory, getContractAt } = ethers;
 
@@ -251,7 +250,7 @@ describe("Election", function () {
   })
 
   it("Should be not be able vote if not a stakeholder", async function() {
-    await (expect(election.connect(notAStakeholder).vote(contestant1))).to.be.revertedWith("ACCESS DENIED")
+    await (expect(election.connect(notAStakeholder).vote(contestant1))).to.be.reverted
   })
 
   it("Stakeholders should not be able to vote twice", async function() {
