@@ -78,6 +78,22 @@ const AdminFunction = (address) => {
         }
     }
 
+    const setupTeachers = async ({address} ) => {
+        const web3Modal = new Web3Modal()
+        const connection = await web3Modal.connect()
+        const provider = new ethers.providers.Web3Provider(connection)
+        const signer = provider.getSigner()
+        const election = new ethers.Contract(address,electionabi.abi, signer)
+        console.log(Student)
+        try {
+            await election.setupTeachers(addresses, {
+                gasLimit:300000
+            })
+        } catch (error) {
+           console.error(error, "why") 
+        }
+    }
+
     const showResult = async ({address} ) => {
         const web3Modal = new Web3Modal()
         const connection = await web3Modal.connect()
@@ -198,7 +214,7 @@ const AdminFunction = (address) => {
                 }}>showResult</Button>
                 <Button onClick={() => {
                     privateViewResult(address)
-                }}>showResult</Button>
+                }}>privateViewResult</Button>
                 {/* <VStack>
                     <Input onChange={handleStudent} placeholder='setupStudent'  />
                     <Button onClick={() => {
@@ -225,6 +241,28 @@ const AdminFunction = (address) => {
                       registerStudent(address)
                   }}>register</Button>
                   </VStack>
+
+                  <VStack>
+                <Upload
+                    accept=".csv,.xlsx,.xls"
+                    action="#"
+                    listType="picture-card"
+                    fileList={customersCsvFile}
+                    onChange={handleChange}
+                    beforeUpload={() => false}
+                    maxCount={1}
+                  >
+                    {customersCsvFile.length === 0 && (
+                      <div>
+                        <div style={{ marginTop: 8 }}>Upload teacher</div>
+                      </div>
+                    )}
+                  </Upload>
+                  <Button onClick={() => {
+                      setupTeachers(address)
+                  }}>register</Button>
+                  </VStack>
+                  
             </HStack>
         </div>
     )

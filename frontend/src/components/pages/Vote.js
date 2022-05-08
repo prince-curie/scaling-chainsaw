@@ -59,7 +59,7 @@ const Vote = () => {
 
 
 	return (
-		<Center>
+		<div>
 		{active ?
 		<div>
 		{positions.map((position,i) => (
@@ -100,10 +100,10 @@ const Vote = () => {
 		  </div>
 		</div> 
 		))}
-		</div>: <Button className='text-center' onClick={() => {
+		</div>: <Center> <Button className='text-center' onClick={() => {
 			activate(connectors.injected)
-		}}>Connect Wallet</Button>}
-		</Center>
+		}}>Connect Wallet</Button> </Center>}
+		</div>
 		
 	)
 }
